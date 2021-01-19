@@ -1,5 +1,5 @@
-import tensorflow as tf
-from tensorflow.keras import layers
+#import tensorflow as tf
+#from tensorflow.keras import layers
 
 NUMBER_OF_CLASSES = 6
 INPUT_DIMENSION = 96
