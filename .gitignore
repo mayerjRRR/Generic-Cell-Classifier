@@ -1,0 +1,13 @@
+*.h5
+!model.h5
+__pycache__
+*.dat
+.idea
+*/.idea
+venv
+logs
+venv
+data/*
+!data/.gitkeep
+*.avi
+*.mp4
