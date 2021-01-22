@@ -10,47 +10,57 @@ from tqdm import tqdm
 from classifier import wrap_in_softmax, build_mobilenet_classifier
 from data_loader import DataLoader
 
-logdir = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-file_writer = tf.summary.create_file_writer(logdir)
+BATCH_SIZE = 32
+SUPPORTED_MICROSCOPES = ["Leica"]
+NUMBER_OF_CLASSES = 6
+INPUT_DIMENSION = 224
 
-model = build_mobilenet_classifier()
-optimizer = Adam()
-batch_size = 32
-epochs = 15
-step = 0
 
-training_dataset = DataLoader(batch_size, "data").train_dataset
+def train_model():
+    logdir = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+    file_writer = tf.summary.create_file_writer(logdir)
 
-loss_metric = tf.keras.metrics.Mean()
-accuracy_metric = tf.keras.metrics.Mean()
+    model = build_mobilenet_classifier()
+    optimizer = Adam()
+    step = 0
 
-train_iterator = tqdm(training_dataset)
-for samples, labels in train_iterator:
-    with GradientTape() as tape:
-        predictions = model(samples)
-        loss = sparse_categorical_crossentropy(labels, predictions, from_logits=True)
+    training_dataset = DataLoader(BATCH_SIZE, "data").train_dataset
 
-    gradients = tape.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    accuracy = sparse_categorical_accuracy(labels, predictions)
+    loss_metric = tf.keras.metrics.Mean()
+    accuracy_metric = tf.keras.metrics.Mean()
 
-    loss_metric.update_state(tf.reduce_mean(loss))
-    accuracy_metric.update_state(tf.reduce_mean(accuracy))
+    train_iterator = tqdm(training_dataset)
+    for samples, labels in train_iterator:
+        with GradientTape() as tape:
+            predictions = model(samples)
+            loss = sparse_categorical_crossentropy(labels, predictions, from_logits=True)
 
-    if step % 50 == 0:
-        with file_writer.as_default():
-            tf.summary.scalar('Loss', loss_metric.result(), step=step)
-            tf.summary.scalar('Accuracy', accuracy_metric.result(), step=step)
-            loss_metric.reset_states()
-            accuracy_metric.reset_states()
-    if step % 500 == 0:
-        softmax_model = wrap_in_softmax(model)
-        softmax_model.save(logdir + "/model.h5")
+        gradients = tape.gradient(loss, model.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        accuracy = sparse_categorical_accuracy(labels, predictions)
 
-    step += 1
+        loss_metric.update_state(tf.reduce_mean(loss))
+        accuracy_metric.update_state(tf.reduce_mean(accuracy))
 
-    train_iterator.set_postfix_str(
-        f'batch_loss={float(loss.numpy().mean()):.4f}, '
-        f'batch_acc={float(accuracy.numpy().mean()):.4f}'
-    )
-    train_iterator.refresh()
+        if step % 50 == 0:
+            with file_writer.as_default(), tf.device("cpu:0"):
+                tf.summary.scalar('Loss', loss_metric.result(), step=step)
+                tf.summary.scalar('Accuracy', accuracy_metric.result(), step=step)
+                tf.summary.image('Cell Sample', samples + 1, step=step, max_outputs=3)
+                loss_metric.reset_states()
+                accuracy_metric.reset_states()
+        if step % 500 == 0:
+            softmax_model = wrap_in_softmax(model)
+            softmax_model.save(logdir + "/model.h5")
+
+        step += 1
+
+        train_iterator.set_postfix_str(
+            f'batch_loss={float(loss.numpy().mean()):.4f}, '
+            f'batch_acc={float(accuracy.numpy().mean()):.4f}'
+        )
+        train_iterator.refresh()
+
+
+if __name__ == "main":
+    train_model()
