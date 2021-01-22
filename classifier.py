@@ -1,20 +1,19 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 
-from trainer import NUMBER_OF_CLASSES, INPUT_DIMENSION
 
 
-def build_mobilenet_classifier():
-    mobilenet_stump = tf.keras.applications.MobileNetV2(input_shape=(INPUT_DIMENSION, INPUT_DIMENSION, 3),
+def build_mobilenet_classifier(number_of_classes, crop_size):
+    mobilenet_stump = tf.keras.applications.MobileNetV2(input_shape=(crop_size, crop_size, 3),
                                                         include_top=False,
                                                         weights='imagenet')
-    input = tf.keras.Input((INPUT_DIMENSION, INPUT_DIMENSION, 3))
+    input = tf.keras.Input((crop_size, crop_size, 3))
     mobilenet_features = mobilenet_stump(input)
     x = tf.keras.layers.Flatten()(mobilenet_features)
     mobilenet_stump.trainable = False
     x = layers.Dense(512, use_bias=True)(x)
     x = layers.LeakyReLU(0.1)(x)
-    x = layers.Dense(NUMBER_OF_CLASSES, use_bias=True)(x)
+    x = layers.Dense(number_of_classes, use_bias=True)(x)
 
     return tf.keras.Model(inputs=input, outputs=x)
 

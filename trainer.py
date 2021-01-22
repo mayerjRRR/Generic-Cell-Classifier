@@ -10,21 +10,17 @@ from tqdm import tqdm
 from classifier import wrap_in_softmax, build_mobilenet_classifier
 from data_loader import DataLoader
 
-BATCH_SIZE = 32
-SUPPORTED_MICROSCOPES = ["Leica"]
-NUMBER_OF_CLASSES = 6
-INPUT_DIMENSION = 224
 
-
-def train_model():
+def train_model(dataset_directory="data", number_of_classes=6, crop_size=224, supported_microscopes=["Leica"],
+                batch_size=32):
     logdir = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     file_writer = tf.summary.create_file_writer(logdir)
 
-    model = build_mobilenet_classifier()
+    model = build_mobilenet_classifier(number_of_classes, crop_size)
     optimizer = Adam()
     step = 0
 
-    training_dataset = DataLoader(BATCH_SIZE, "data").train_dataset
+    training_dataset = DataLoader(batch_size, dataset_directory, supported_microscopes, crop_size).train_dataset
 
     loss_metric = tf.keras.metrics.Mean()
     accuracy_metric = tf.keras.metrics.Mean()
@@ -62,5 +58,5 @@ def train_model():
         train_iterator.refresh()
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     train_model()

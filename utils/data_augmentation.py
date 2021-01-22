@@ -1,11 +1,9 @@
 import tensorflow as tf
-import tensorflow_addons
-
-from trainer import INPUT_DIMENSION
+# from tensorflow_addons.image import rotate
 
 
-def augment_image(image):
-    image = crop(image)
+def augment_image(image, crop_size):
+    image = crop(image, crop_size)
     image = flip(image)
     image = _rotate(image)
     image = light(image)
@@ -18,8 +16,8 @@ def light(image):
 
 
 def _rotate(image):
-    random_angle = tf.random.uniform([], -180, 1800)
-    image = tensorflow_addons.image.rotate(image, random_angle, interpolation="BILINEAR")
+    # random_angle = tf.random.uniform([], -180, 180)
+    # image = rotate(image, random_angle, interpolation="BILINEAR")
     return image
 
 
@@ -29,6 +27,6 @@ def flip(image):
     return image
 
 
-def crop(image):
-    image = tf.image.random_crop(image, [INPUT_DIMENSION, INPUT_DIMENSION, 3])
+def crop(image, crop_size):
+    image = tf.image.random_crop(image, [crop_size, crop_size, 3])
     return image
