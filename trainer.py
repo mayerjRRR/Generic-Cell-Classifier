@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import fire
 import tensorflow as tf
 from tensorflow import GradientTape
 from tensorflow.python.keras.losses import sparse_categorical_crossentropy
@@ -11,7 +12,10 @@ from classifier import wrap_in_softmax, build_mobilenet_classifier
 from data_loader import DataLoader
 
 
-def train_model(dataset_directory="data", number_of_classes=6, crop_size=224, supported_microscopes=["Leica"],
+def train_model(dataset_directory="data",
+                number_of_classes=6,
+                crop_size=224,
+                supported_microscopes=["Leica"],
                 batch_size=32):
     logdir = "logs/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     file_writer = tf.summary.create_file_writer(logdir)
@@ -59,4 +63,4 @@ def train_model(dataset_directory="data", number_of_classes=6, crop_size=224, su
 
 
 if __name__ == "__main__":
-    train_model()
+    fire.Fire(train_model)

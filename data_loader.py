@@ -31,7 +31,7 @@ class DataLoader:
         self.train_dataset = self.generate_training_dataset(supported_microscopes, crop_size)
 
     def generate_training_dataset(self, supported_microscopes, crop_size):
-        image_paths_and_labels = get_file_name_and_label_from_csv(self.dataset_directory, "file_names_and_labels.csv",
+        image_paths_and_labels = get_file_name_and_label_from_csv(self.dataset_directory, "data.csv",
                                                                   supported_microscopes)
         train_dataset = tf.data.Dataset.from_tensor_slices(image_paths_and_labels)
         train_dataset = train_dataset.repeat()
