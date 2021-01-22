@@ -1,5 +1,5 @@
-#import tensorflow as tf
-#from tensorflow.keras import layers
+import tensorflow as tf
+from tensorflow.keras import layers
 
 NUMBER_OF_CLASSES = 6
 INPUT_DIMENSION = 96
@@ -8,7 +8,7 @@ def build_mobilenet_classifier():
     mobilenet_stump = tf.keras.applications.MobileNetV2(input_shape=(INPUT_DIMENSION,INPUT_DIMENSION,3),
                                                    include_top=False,
                                                    weights='imagenet')
-    input = tf.keras.Input((INPUT_DIMENSION,INPUT_DIMENSION))
+    input = tf.keras.Input((INPUT_DIMENSION,INPUT_DIMENSION,3))
     mobilenet_features = mobilenet_stump(input)
     x = tf.keras.layers.Flatten()(mobilenet_features)
     mobilenet_stump.trainable = False

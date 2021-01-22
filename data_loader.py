@@ -29,11 +29,11 @@ class DataLoader:
         self.train_dataset = self.generate_training_dataset()
 
     def generate_training_dataset(self):
-        image_paths_and_labels = self.get_file_name_and_label_from_csv(os.join.path("data", "piss.csv"))
+        image_paths_and_labels = get_file_name_and_label_from_csv(os.path.join("data", "piss.csv"))
         train_dataset = tf.data.Dataset.from_tensor_slices(image_paths_and_labels)
         train_dataset = train_dataset.repeat()
         train_dataset = train_dataset.map(load_image,
-                                          num_parallel_calls=tf.data.experimental.AUTOTUNE)
+                                         num_parallel_calls=tf.data.experimental.AUTOTUNE)
         train_dataset = train_dataset.shuffle(self.buffer_size)
         train_dataset = train_dataset.batch(self.batch_size)
         return train_dataset

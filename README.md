@@ -11,7 +11,7 @@ Written in Python with Tensorflow 2.
 ## Training your model
 
 - copy your training data to the `data` directory
-- run `python classifier.py`
+- run `python trainer.py`
 - check your training progress with `tensorboard --logdir==logs`
 - find your trained model `model.h5` in the intuitively named model directory in `logs`
 

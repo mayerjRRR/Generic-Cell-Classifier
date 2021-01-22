@@ -1,10 +1,10 @@
 from datetime import datetime
 
 import tensorflow as tf
-from tensorflow_core import GradientTape
-from tensorflow_core.python.keras.losses import categorical_crossentropy
-from tensorflow_core.python.keras.metrics import categorical_accuracy
-from tensorflow_core.python.keras.optimizer_v2.adam import Adam
+from tensorflow import GradientTape
+from tensorflow.python.keras.losses import sparse_categorical_crossentropy
+from tensorflow.python.keras.metrics import sparse_categorical_accuracy
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 from tqdm import tqdm
 
 from classifier import wrap_in_softmax, build_mobilenet_classifier
@@ -28,11 +28,11 @@ train_iterator = tqdm(training_dataset)
 for samples, labels in train_iterator:
     with GradientTape() as tape:
         predictions = model(samples)
-        loss = categorical_crossentropy(labels, predictions, from_logits=True)
+        loss = sparse_categorical_crossentropy(labels, predictions, from_logits=True)
 
     gradients = tape.gradient(loss, model.trainable_variables)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
-    accuracy = categorical_accuracy(labels, predictions)
+    accuracy = sparse_categorical_accuracy(labels, predictions)
 
     loss_metric.update_state(tf.reduce_mean(loss))
     accuracy_metric.update_state(tf.reduce_mean(accuracy))
